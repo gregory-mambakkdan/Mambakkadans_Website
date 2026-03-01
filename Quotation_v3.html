@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mambakkadans Steels & Cements</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #0f172a;
+        --accent: #f59e0b;
+        --accent2: #2563eb;
+        --bg: #f1f5f9;
+        --card: #ffffff;
+        --text: #334155;
+        --muted: #64748b;
+        --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Barlow', sans-serif;
+        background: var(--bg);
+        padding: 30px 20px 60px;
+        color: var(--text);
+    }
+
+    .container {
+        background: var(--card);
+        padding: 45px 50px;
+        max-width: 1050px;
+        margin: auto;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.10);
+    }
+
+    /* HEADER */
+    .header {
+        text-align: center;
+        margin-bottom: 36px;
+        padding-bottom: 24px;
+        border-bottom: 2px solid var(--border);
+        position: relative;
+    }
+
+    .header::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: var(--accent);
+        margin: 14px auto 0;
+        border-radius: 2px;
+    }
+
+    h1 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 800;
+        font-size: 40px;
+        color: var(--primary);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .subtitle {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 14px;
+        color: var(--muted);
+        letter-spacing: 4px;
+        margin-top: 4px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    /* CUSTOMER ROW */
+    .customer-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 12px;
+        gap: 16px;
+        margin-bottom: 28px;
+        background: #f8fafc;
+        padding: 18px 20px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    .rates-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin-bottom: 28px;
+        background: #f8fafc;
+        padding: 14px 20px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        margin-top: -16px;
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    .customer-row {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        margin-bottom: 0;
+    }
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    input, select {
+        padding: 10px 12px;
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: 'Barlow', sans-serif;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #fff;
+        color: var(--text);
+    }
+
+    input:focus, select:focus {
+        border-color: var(--accent2);
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    /* CATEGORY TABS */
+    .tabs-wrapper {
+        margin-bottom: 0;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 2px solid var(--border);
+        margin-bottom: 24px;
+    }
+
+    .tab-btn {
+        padding: 12px 28px;
+        border: none;
+        background: transparent;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--muted);
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+        border-radius: 0;
+    }
+
+    .tab-btn:hover { color: var(--primary); }
+
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--accent);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* PRODUCT INPUT GRID */
+    .product-grid {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 20px;
+        background: #f8fafc;
+        padding: 18px 20px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+    }
+
+    .grid-3 { grid-template-columns: 2.5fr 1fr 1fr; }
+    .grid-2 { grid-template-columns: 2.5fr 1fr; }
+
+    /* GAUGE TOGGLE */
+    .gauge-toggle {
+        display: flex;
+        gap: 8px;
+        margin-top: 2px;
+    }
+
+    .gauge-btn {
+        flex: 1;
+        padding: 9px 0;
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        background: #fff;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.18s;
+    }
+
+    .gauge-btn.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+
+    .gauge-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    /* ACTION ROW */
+    .action-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
+    button.btn-add {
+        flex: 1;
+        padding: 12px 24px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    button.btn-add:hover { background: #1e293b; }
+
+    button.btn-reset {
+        padding: 12px 24px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        border-radius: 8px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    button.btn-reset:hover { background: #fecaca; }
+
+    /* TABLE */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    thead tr {
+        background: var(--primary);
+    }
+
+    th {
+        color: #fff;
+        padding: 12px 14px;
+        text-align: left;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 600;
+        font-size: 13px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    td {
+        border-bottom: 1px solid var(--border);
+        padding: 11px 14px;
+        color: var(--text);
+    }
+
+    tr:nth-child(even) td { background: #f8fafc; }
+    tr:last-child td { border-bottom: none; }
+
+    .cat-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        font-family: 'Barlow Condensed', sans-serif;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+    .badge-gp { background: #dbeafe; color: #1d4ed8; }
+    .badge-gi { background: #dcfce7; color: #15803d; }
+    .badge-tmt { background: #fef3c7; color: #b45309; }
+    .badge-rs  { background: #f3e8ff; color: #7e22ce; }
+
+    .btn-del {
+        background: none;
+        border: none;
+        color: #cbd5e1;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: color 0.2s;
+        line-height: 1;
+    }
+    .btn-del:hover { color: #ef4444; }
+
+    /* TOTALS */
+    .totals-card {
+        margin-top: 24px;
+        background: var(--primary);
+        padding: 22px 28px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .totals-left {
+        display: flex;
+        gap: 30px;
+    }
+
+    .totals-stat {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .totals-stat span:first-child {
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .totals-stat span:last-child {
+        font-size: 20px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        color: #fff;
+        margin-top: 2px;
+    }
+
+    .totals-final-wrap {
+        text-align: right;
+    }
+
+    .totals-final-wrap span:first-child {
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        display: block;
+    }
+
+    .totals-final {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: 1px;
+    }
+
+    .btn-pdf {
+        width: 100%;
+        margin-top: 20px;
+        padding: 16px;
+        background: var(--accent2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-pdf:hover { background: #1d4ed8; }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+        .container { padding: 24px 16px; }
+        h1 { font-size: 26px; }
+        .customer-row { grid-template-columns: 1fr 1fr; }
+        .rates-row { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr; }
+        .totals-card { flex-direction: column; align-items: flex-start; }
+        .totals-final-wrap { text-align: left; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Mambakkadans Steels & Cements</h1>
+        <div class="subtitle">Professional Quotation System</div>
+    </div>
+
+    <!-- Customer Details -->
+    <div class="customer-row">
+        <div class="input-group">
+            <label>Customer Name</label>
+            <input type="text" id="customer" placeholder="Enter customer name">
+        </div>
+        <div class="input-group">
+            <label>Date</label>
+            <input type="date" id="date">
+        </div>
+    </div>
+    <div class="rates-row">
+        <div class="input-group">
+            <label>GP Rate (₹/kg)</label>
+            <input type="number" id="rate-gp" value="74" oninput="recalcAll()">
+        </div>
+        <div class="input-group">
+            <label>GI Rate (₹/kg)</label>
+            <input type="number" id="rate-gi" value="80" oninput="recalcAll()">
+        </div>
+        <div class="input-group">
+            <label>TMT Rate (₹/kg)</label>
+            <input type="number" id="rate-tmt" value="68.5" oninput="recalcAll()">
+        </div>
+        <div class="input-group">
+            <label>Sheet Rate (₹/sqft)</label>
+            <input type="number" id="rate-rs" value="35.5" oninput="recalcAll()">
+        </div>
+        <div class="input-group">
+            <label>Freight / Coolie (₹)</label>
+            <input type="number" id="freight" value="0" oninput="updateTotals()">
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="tabs-wrapper">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('gp', this)">GP Pipes</button>
+            <button class="tab-btn" onclick="switchTab('gi', this)">GI Pipes</button>
+            <button class="tab-btn" onclick="switchTab('tmt', this)">TMT Bars</button>
+            <button class="tab-btn" onclick="switchTab('rs', this)">Roofing Sheets</button>
+        </div>
+
+        <!-- GP TAB -->
+        <div class="tab-content active" id="tab-gp">
+            <div class="product-grid grid-3">
+                <div class="input-group">
+                    <label>GP Size</label>
+                    <select id="gp-size" onchange="updateGpGauges()"></select>
+                </div>
+                <div class="input-group">
+                    <label>Gauge</label>
+                    <div class="gauge-toggle">
+                        <button class="gauge-btn active" id="gp-g16" onclick="selectGauge('gp', '16')">16G</button>
+                        <button class="gauge-btn" id="gp-g18" onclick="selectGauge('gp', '18')">18G</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Quantity (Nos)</label>
+                    <input type="number" id="gp-qty" min="1" placeholder="0" onkeydown="if(event.key==='Enter') addItem('gp')">
+                </div>
+            </div>
+            <div class="action-row">
+                <button class="btn-add" onclick="addItem('gp')">+ Add GP Item</button>
+                <button class="btn-reset" onclick="resetBill()">Reset All</button>
+            </div>
+        </div>
+
+        <!-- GI TAB -->
+        <div class="tab-content" id="tab-gi">
+            <div class="product-grid grid-2">
+                <div class="input-group">
+                    <label>GI Size</label>
+                    <select id="gi-size"></select>
+                </div>
+                <div class="input-group">
+                    <label>Quantity (Nos)</label>
+                    <input type="number" id="gi-qty" min="1" placeholder="0" onkeydown="if(event.key==='Enter') addItem('gi')">
+                </div>
+            </div>
+            <div class="action-row">
+                <button class="btn-add" onclick="addItem('gi')">+ Add GI Item</button>
+                <button class="btn-reset" onclick="resetBill()">Reset All</button>
+            </div>
+        </div>
+        <!-- TMT TAB -->
+        <div class="tab-content" id="tab-tmt">
+            <div class="product-grid grid-2">
+                <div class="input-group">
+                    <label>TMT Size</label>
+                    <select id="tmt-size"></select>
+                </div>
+                <div class="input-group">
+                    <label>Quantity (Nos)</label>
+                    <input type="number" id="tmt-qty" min="1" placeholder="0" onkeydown="if(event.key==='Enter') addItem('tmt')">
+                </div>
+            </div>
+            <div class="action-row">
+                <button class="btn-add" onclick="addItem('tmt')">+ Add TMT Item</button>
+                <button class="btn-reset" onclick="resetBill()">Reset All</button>
+            </div>
+        </div>
+
+        <!-- ROOFING SHEET TAB -->
+        <div class="tab-content" id="tab-rs">
+            <div class="product-grid grid-3">
+                <div class="input-group">
+                    <label>Length (ft) — JSW 0.35mm | Breadth: 3.61 ft</label>
+                    <select id="rs-length" onchange="toggleCustomLength()">
+                        <option value="6">6 ft</option>
+                        <option value="8">8 ft</option>
+                        <option value="10">10 ft</option>
+                        <option value="12">12 ft</option>
+                        <option value="14">14 ft</option>
+                        <option value="16">16 ft</option>
+                        <option value="18">18 ft</option>
+                        <option value="20">20 ft</option>
+                        <option value="22">22 ft</option>
+                        <option value="24">24 ft</option>
+                        <option value="custom">Custom Length...</option>
+                    </select>
+                </div>
+                <div class="input-group" id="rs-custom-group" style="display:none;">
+                    <label>Custom Length (ft)</label>
+                    <input type="number" id="rs-custom-length" min="0.1" step="0.1" placeholder="e.g. 7.5">
+                </div>
+                <div class="input-group">
+                    <label>Quantity (Nos)</label>
+                    <input type="number" id="rs-qty" min="1" placeholder="0" onkeydown="if(event.key==='Enter') addItem('rs')">
+                </div>
+            </div>
+            <div class="action-row">
+                <button class="btn-add" onclick="addItem('rs')">+ Add Roofing Sheet</button>
+                <button class="btn-reset" onclick="resetBill()">Reset All</button>
+            </div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Cat</th>
+                <th>Size / Length</th>
+                <th>Gauge</th>
+                <th>Qty</th>
+                <th>Wt/No or Sqft</th>
+                <th>Total Wt / Sqft</th>
+                <th>Rate</th>
+                <th style="text-align:right;">Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="billBody">
+            <tr><td colspan="9" class="empty-state">No items added yet. Select a category above and add items.</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="totals-card">
+        <div class="totals-left">
+            <div class="totals-stat">
+                <span>Total Weight</span>
+                <span id="totalWeight">0.00 kg</span>
+            </div>
+            <div class="totals-stat">
+                <span>Freight</span>
+                <span id="freightDisplay">₹0.00</span>
+            </div>
+            <div class="totals-stat">
+                <span>Items</span>
+                <span id="itemCount">0</span>
+            </div>
+        </div>
+        <div class="totals-final-wrap">
+            <span>Grand Total</span>
+            <div class="totals-final" id="finalTotal">₹0.00</div>
+        </div>
+    </div>
+
+    <button class="btn-pdf" onclick="saveQuotation()">⬇ Download Official PDF Quote</button>
+
+</div>
+
+<script>
+document.getElementById('date').valueAsDate = new Date();
+
+// ===================== DATA =====================
+
+const gpData = {
+    // Square
+    "1/2\" × 1/2\" (16×16mm)":       { 16: 4.0,  18: 3.2  },
+    "3/4\" × 3/4\" (20×20mm)":       { 16: 5.0,  18: 4.0  },
+    "1\" × 1\" (25×25mm)":           { 16: 6.0,  18: 5.2  },
+    "1 1/4\" × 1 1/4\" (32×32mm)":   { 16: 8.0,  18: null },
+    "1 1/2\" × 1 1/2\" (40×40mm)":   { 16: 10.0, 18: null },
+    "2\" × 2\" (50×50mm)":           { 16: 12.6, 18: null },
+    "3\" × 3\" (75×75mm)":           { 16: 19.0, 18: null },
+    "4\" × 4\" (100×100mm)":         { 16: 26.0, 18: null },
+    // Rectangular
+    "1\" × 10\" (25×10mm)":          { 16: 5.0,  18: null },
+    "1 1/2\" × 10\" (40×10mm)":      { 16: 6.2,  18: null },
+    "1 1/2\" × 3/4\" (40×20mm)":     { 16: 7.6,  18: null },
+    "2\" × 1\" (50×25mm)":           { 16: 9.6,  18: 8.5  },
+    "2 1/2\" × 1 1/2\" (60×40mm)":   { 16: 12.6, 18: 12.5 },
+    "3\" × 1\" (75×25mm)":           { 16: 12.6, 18: 11.0 },
+    "3\" × 1 1/2\" (80×40mm)":       { 16: 15.2, 18: 12.8 },
+    "4\" × 1\" (100×25mm)":          { 16: 15.2, 18: null },
+    "4\" × 2\" (100×50mm)":          { 16: 19.0, 18: null },
+    // Round GP
+    "1\" Round GP":                  { 16: 6.0,  18: null },
+    "1 1/4\" Round GP":              { 16: 7.9,  18: null },
+    "1 1/2\" Round GP":              { 16: 9.9,  18: null },
+    "2\" Round GP":                  { 16: 12.5, 18: null },
+    "2 1/2\" Round GP":              { 16: 14.5, 18: null },
+    "3\" Round GP":                  { 16: 20.5, 18: null }
+};
+
+const giData = {
+    "1/2\" Round GI":   0,
+    "3/4\" Round GI":   7.9,
+    "1\" Round GI":     9.8,
+    "1 1/4\" Round GI": 12.4,
+    "1 1/2\" Round GI": 14.4,
+    "2\" Round GI":     18.0,
+    "2 1/2\" Round GI": 22.9,
+    "3\" Round GI":     26.0,
+    "3 1/2\" Round GI": 32.0,
+    "4\" Round GI":     34.0,
+    "5\" Round GI":     45.3
+};
+
+const tmtData = {
+    "8mm  — Metcon":  { kgPerPiece: 4.6,  nosPerBundle: 10 },
+    "10mm — Metcon":  { kgPerPiece: 7.4,  nosPerBundle: 7  },
+    "12mm — Metcon":  { kgPerPiece: 10.5, nosPerBundle: 5  },
+    "16mm — Metcon":  { kgPerPiece: 18.5, nosPerBundle: 3  },
+    "20mm — Metcon":  { kgPerPiece: 28.5, nosPerBundle: 2  },
+};
+
+let gpSelectedGauge = '16';
+
+function toggleCustomLength() {
+    const val = document.getElementById('rs-length').value;
+    const grp = document.getElementById('rs-custom-group');
+    grp.style.display = val === 'custom' ? 'flex' : 'none';
+    if (val === 'custom') document.getElementById('rs-custom-length').focus();
+}
+
+function populateDropdowns() {
+    const gpSel = document.getElementById('gp-size');
+    for (let size in gpData) {
+        let opt = document.createElement('option');
+        opt.value = size; opt.text = size;
+        gpSel.add(opt);
+    }
+    updateGpGauges();
+
+    const giSel = document.getElementById('gi-size');
+    for (let size in giData) {
+        let opt = document.createElement('option');
+        opt.value = size; opt.text = size;
+        giSel.add(opt);
+    }
+
+    const tmtSel = document.getElementById('tmt-size');
+    for (let size in tmtData) {
+        let opt = document.createElement('option');
+        opt.value = size; opt.text = size;
+        tmtSel.add(opt);
+    }
+}
+
+function updateGpGauges() {
+    const size = document.getElementById('gp-size').value;
+    const has18 = gpData[size] && gpData[size][18] !== null;
+    const btn18 = document.getElementById('gp-g18');
+    btn18.disabled = !has18;
+    if (!has18) {
+        btn18.classList.remove('active');
+        document.getElementById('gp-g16').classList.add('active');
+        gpSelectedGauge = '16';
+    }
+}
+
+function selectGauge(cat, g) {
+    if (cat === 'gp') {
+        const size = document.getElementById('gp-size').value;
+        if (g === '18' && (!gpData[size] || gpData[size][18] === null)) return;
+        gpSelectedGauge = g;
+        document.getElementById('gp-g16').classList.toggle('active', g === '16');
+        document.getElementById('gp-g18').classList.toggle('active', g === '18');
+    }
+}
+
+function switchTab(tab, el) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ===================== CART =====================
+
+let cartItems = [];
+
+function addItem(cat) {
+    if (cat === 'gp') {
+        const rate = parseFloat(document.getElementById('rate-gp').value) || 0;
+        const size = document.getElementById('gp-size').value;
+        const gauge = gpSelectedGauge;
+        const qty = parseFloat(document.getElementById('gp-qty').value);
+        if (!qty || qty <= 0) { alert('Enter a valid quantity'); return; }
+
+        let wt = gpData[size][parseInt(gauge)];
+        let usedGauge = gauge;
+        if (!wt) { wt = gpData[size][16]; usedGauge = '16'; alert(`18G not available for ${size}. Using 16G.`); }
+
+        cartItems.push({ cat: 'GP', size, gauge: usedGauge + 'G', qty, weightPerNo: wt, totalWeight: wt * qty, rate, amount: wt * qty * rate });
+        document.getElementById('gp-qty').value = '';
+        document.getElementById('gp-qty').focus();
+
+    } else if (cat === 'tmt') {
+        const rate = parseFloat(document.getElementById('rate-tmt').value) || 0;
+        const size = document.getElementById('tmt-size').value;
+        const qty = parseFloat(document.getElementById('tmt-qty').value);
+        if (!qty || qty <= 0) { alert('Enter a valid quantity'); return; }
+
+        const wt = tmtData[size].kgPerPiece;
+        cartItems.push({ cat: 'TMT', size, gauge: '—', qty, weightPerNo: wt, totalWeight: wt * qty, rate, amount: wt * qty * rate });
+        document.getElementById('tmt-qty').value = '';
+        document.getElementById('tmt-qty').focus();
+
+    } else if (cat === 'rs') {
+        const rate = parseFloat(document.getElementById('rate-rs').value) || 0;
+        const lengthSel = document.getElementById('rs-length').value;
+        let length;
+        if (lengthSel === 'custom') {
+            length = parseFloat(document.getElementById('rs-custom-length').value);
+            if (!length || length <= 0) { alert('Enter a valid custom length'); return; }
+        } else {
+            length = parseFloat(lengthSel);
+        }
+        const qty = parseFloat(document.getElementById('rs-qty').value);
+        if (!qty || qty <= 0) { alert('Enter a valid quantity'); return; }
+
+        const breadth = 3.61;
+        const sqftPerSheet = parseFloat((length * breadth).toFixed(2));
+        const totalSqft = parseFloat((sqftPerSheet * qty).toFixed(2));
+        const size = `${length} ft × 3.61 ft (JSW 0.35mm)`;
+        cartItems.push({ cat: 'RS', size, gauge: '0.35mm', qty, weightPerNo: sqftPerSheet, totalWeight: totalSqft, rate, amount: totalSqft * rate, isSheet: true });
+        document.getElementById('rs-qty').value = '';
+        document.getElementById('rs-qty').focus();
+
+    } else {
+        const rate = parseFloat(document.getElementById('rate-gi').value) || 0;
+        const size = document.getElementById('gi-size').value;
+        const qty = parseFloat(document.getElementById('gi-qty').value);
+        if (!qty || qty <= 0) { alert('Enter a valid quantity'); return; }
+
+        const wt = giData[size];
+        cartItems.push({ cat: 'GI', size, gauge: '—', qty, weightPerNo: wt, totalWeight: wt * qty, rate, amount: wt * qty * rate });
+        document.getElementById('gi-qty').value = '';
+        document.getElementById('gi-qty').focus();
+    }
+
+    renderTable();
+}
+
+function deleteItem(index) {
+    cartItems.splice(index, 1);
+    renderTable();
+}
+
+function renderTable() {
+    const tbody = document.getElementById('billBody');
+
+    if (cartItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No items added yet. Select a category above and add items.</td></tr>';
+        updateTotals();
+        return;
+    }
+
+    tbody.innerHTML = cartItems.map((item, i) => `
+        <tr>
+            <td><span class="cat-badge badge-${item.cat.toLowerCase()}">${item.cat}</span></td>
+            <td>${item.size}</td>
+            <td>${item.gauge}</td>
+            <td>${item.qty}</td>
+            <td>${item.isSheet ? item.weightPerNo + ' sqft' : item.weightPerNo}</td>
+            <td>${item.isSheet ? item.totalWeight.toFixed(2) + ' sqft' : item.totalWeight.toFixed(2) + ' kg'}</td>
+            <td>₹${item.rate}${item.isSheet ? '/sqft' : '/kg'}</td>
+            <td style="text-align:right; font-weight:600;">₹${item.amount.toFixed(2)}</td>
+            <td><button class="btn-del" onclick="deleteItem(${i})" title="Remove">✕</button></td>
+        </tr>
+    `).join('');
+
+    updateTotals();
+}
+
+function recalcAll() {
+    const gpRate = parseFloat(document.getElementById('rate-gp').value) || 0;
+    const giRate = parseFloat(document.getElementById('rate-gi').value) || 0;
+    const tmtRate = parseFloat(document.getElementById('rate-tmt').value) || 0;
+    const rsRate = parseFloat(document.getElementById('rate-rs').value) || 0;
+    cartItems.forEach(item => {
+        if (item.cat === 'GP') item.rate = gpRate;
+        else if (item.cat === 'GI') item.rate = giRate;
+        else if (item.cat === 'TMT') item.rate = tmtRate;
+        else if (item.cat === 'RS') item.rate = rsRate;
+        item.amount = item.totalWeight * item.rate;
+    });
+    renderTable();
+}
+
+function updateTotals() {
+    let grandWeight = 0, grandTotal = 0;
+    cartItems.forEach(item => { grandWeight += item.totalWeight; grandTotal += item.amount; });
+    const freight = parseFloat(document.getElementById('freight').value) || 0;
+
+    document.getElementById('totalWeight').textContent = grandWeight.toFixed(2) + ' kg';
+    document.getElementById('freightDisplay').textContent = '₹' + freight.toFixed(2);
+    document.getElementById('itemCount').textContent = cartItems.length;
+    document.getElementById('finalTotal').textContent = '₹' + (grandTotal + freight).toFixed(2);
+}
+
+function resetBill() {
+    if (confirm('Clear all items?')) {
+        cartItems = [];
+        document.getElementById('freight').value = 0;
+        renderTable();
+    }
+}
+
+// ===================== PDF =====================
+
+async function saveQuotation() {
+    if (cartItems.length === 0) { alert('Add at least one item before downloading.'); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const customer = document.getElementById('customer').value || 'Cash Customer';
+    const date = document.getElementById('date').value;
+    const freight = parseFloat(document.getElementById('freight').value) || 0;
+
+    let pdfWeight = 0, pdfItemTotal = 0;
+    const tableRows = cartItems.map(item => {
+        if (!item.isSheet) pdfWeight += item.totalWeight;
+        pdfItemTotal += item.amount;
+        const unitLabel = item.isSheet ? ' sqft' : ' kg';
+        const rateLabel = item.isSheet ? '/sqft' : '/kg';
+        return [item.cat, item.size, item.gauge, item.qty,
+            item.weightPerNo + unitLabel,
+            item.totalWeight.toFixed(2) + unitLabel,
+            'Rs.' + item.rate + rateLabel,
+            'Rs.' + item.amount.toFixed(2)];
+    });
+
+    // Title
+    doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+    doc.text('MAMBAKKADANS STEELS & CEMENTS', 105, 18, null, null, 'center');
+    doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+    doc.text('Quotation / Estimate', 105, 25, null, null, 'center');
+
+    // Divider
+    doc.setDrawColor(200); doc.line(14, 29, 196, 29);
+
+    // Customer
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    doc.text('Customer:', 14, 37);
+    doc.setFont('helvetica', 'normal');
+    doc.text(customer, 42, 37);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Date:', 150, 37);
+    doc.setFont('helvetica', 'normal');
+    doc.text(date, 163, 37);
+
+    // Table
+    doc.autoTable({
+        startY: 43,
+        head: [['Cat', 'Size', 'Gauge', 'Qty', 'Wt/No', 'Total Wt', 'Rate', 'Amount']],
+        body: tableRows,
+        theme: 'striped',
+        headStyles: { fillColor: [15, 23, 42], fontSize: 9, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        columnStyles: { 7: { halign: 'right' } },
+        foot: [
+            ['', '', '', '', '', pdfWeight.toFixed(2) + ' kg', 'Subtotal:', 'Rs.' + pdfItemTotal.toFixed(2)],
+            ['', '', '', '', '', '', 'Freight:', 'Rs.' + freight.toFixed(2)],
+            ['', '', '', '', '', '', 'GRAND TOTAL:', 'Rs.' + (pdfItemTotal + freight).toFixed(2)]
+        ],
+        footStyles: { fillColor: [241, 245, 249], textColor: [0,0,0], fontStyle: 'bold', fontSize: 9 }
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 16;
+    doc.setFontSize(9); doc.setTextColor(100);
+    doc.text('Thank you for your business! — Mambakkadans Steels & Cements', 105, finalY, null, null, 'center');
+
+    doc.save(`${customer.replace(/\s+/g,'_')}_Quotation.pdf`);
+}
+
+// ===================== START =====================
+populateDropdowns();
+</script>
+
+</body>
+</html>
