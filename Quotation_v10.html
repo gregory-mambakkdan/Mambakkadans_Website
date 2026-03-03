@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mambakkadans Steels & Cements</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET & BASE ─────────────────────────────────────────────────────── */
+:root {
+    --primary: #0f172a;
+    --accent:  #f59e0b;
+    --blue:    #2563eb;
+    --bg:      #f1f5f9;
+    --card:    #ffffff;
+    --text:    #334155;
+    --muted:   #64748b;
+    --border:  #e2e8f0;
+    --panel:   #f8fafc;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    /* no body padding — nav and container manage their own spacing */
+}
+
+/* ── TOP NAV ──────────────────────────────────────────────────────────── */
+.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--primary);
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    height: 52px;
+}
+.nav-brand {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 8px;
+}
+.nav-btn {
+    padding: 7px 14px;
+    border: none;
+    background: transparent;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all .2s;
+    white-space: nowrap;
+}
+.nav-btn:hover  { color: #fff; background: rgba(255,255,255,.08); }
+.nav-btn.active { color: var(--primary); background: var(--accent); }
+
+/* ── PAGE SHELL ───────────────────────────────────────────────────────── */
+.page { display: none; padding: 16px 12px 60px; }
+.page.active { display: block; }
+
+.container {
+    max-width: 1050px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.09);
+    padding: 28px 20px;
+}
+
+/* ── HEADER ───────────────────────────────────────────────────────────── */
+.header {
+    text-align: center;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+}
+.header::after {
+    content: '';
+    display: block;
+    width: 50px; height: 4px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 12px auto 0;
+}
+h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: clamp(22px, 5vw, 38px);
+    color: var(--primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+.subtitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(10px, 2.5vw, 13px);
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* ── FORM FIELDS ──────────────────────────────────────────────────────── */
+label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 5px;
+}
+input, select {
+    width: 100%;
+    padding: 10px 11px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: 'Barlow', sans-serif;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    /* prevent iOS zoom on focus */
+    font-size: max(16px, 14px);
+}
+input:focus, select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+.field { display: flex; flex-direction: column; }
+
+/* ── INFO PANEL ───────────────────────────────────────────────────────── */
+.info-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.info-row-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.info-row-rates {
+    display: grid;
+    gap: 10px;
+    /* columns set dynamically by JS, but on mobile always 2 col */
+    grid-template-columns: repeat(2, 1fr);
+}
+.divider { border: none; border-top: 1px dashed var(--border); }
+
+/* ── TABS ─────────────────────────────────────────────────────────────── */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: color .2s, border-color .2s;
+    white-space: nowrap;
+}
+.tab-btn:hover  { color: var(--primary); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--accent); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ── ENTRY PANEL ──────────────────────────────────────────────────────── */
+.entry-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+.fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: end;
+}
+/* Third field always full width on its own row on mobile */
+.fields-grid .field:last-child { grid-column: 1 / -1; }
+
+/* ── GAUGE BUTTONS ────────────────────────────────────────────────────── */
+.gauge-row { display: flex; gap: 8px; }
+.gauge-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    background: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .18s;
+}
+.gauge-btn.active   { background: var(--primary); color: #fff; border-color: var(--primary); }
+.gauge-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ── ACTION ROW ───────────────────────────────────────────────────────── */
+.action-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.btn-add {
+    flex: 1;
+    padding: 13px 16px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s;
+}
+.btn-add:hover  { background: #1e293b; }
+.btn-reset {
+    padding: 13px 16px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s;
+    white-space: nowrap;
+}
+.btn-reset:hover { background: #fecaca; }
+
+/* ── BILL TABLE ───────────────────────────────────────────────────────── */
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+thead tr { background: var(--primary); }
+th {
+    color: #fff;
+    padding: 11px 12px;
+    text-align: left;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+td {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+    color: var(--text);
+    white-space: nowrap;
+}
+tr:nth-child(even) td { background: #f8fafc; }
+tr:last-child td { border-bottom: none; }
+.empty-state {
+    text-align: center;
+    padding: 36px;
+    color: #94a3b8;
+    font-size: 13px;
+    white-space: normal;
+    min-width: unset;
+}
+
+/* ── CATEGORY BADGES ──────────────────────────────────────────────────── */
+.cat-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.btn-del {
+    background: none; border: none;
+    color: #cbd5e1; cursor: pointer;
+    font-size: 15px; padding: 2px 6px;
+    border-radius: 4px; transition: color .2s; line-height: 1;
+}
+.btn-del:hover { color: #ef4444; }
+
+/* ── TOTALS CARD ──────────────────────────────────────────────────────── */
+.totals-card {
+    margin-top: 16px;
+    background: var(--primary);
+    padding: 18px 20px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+}
+.totals-stat { display: flex; flex-direction: column; }
+.stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.stat-value {
+    font-size: 17px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 2px;
+}
+.totals-grand {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding-top: 12px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+.grand-total {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 1px;
+}
+
+.btn-pdf {
+    width: 100%;
+    margin-top: 16px;
+    padding: 15px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s;
+}
+.btn-pdf:hover { background: #1d4ed8; }
+
+/* ── CATALOGUE ────────────────────────────────────────────────────────── */
+.cat-section { margin-bottom: 32px; }
+.cat-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--primary);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 3px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.cat-rate-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.cat-rate-row label { font-size: 11px; margin: 0; white-space: nowrap; }
+.cat-rate-input { width: 100px !important; padding: 7px 10px !important; font-size: 14px !important; }
+.cat-rate-desc { font-size: 11px; color: var(--muted); }
+.cat-sub-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 16px 0 6px;
+}
+.cat-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    margin-bottom: 4px;
+}
+.cat-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 360px; }
+.cat-table thead tr { background: #f1f5f9; }
+.cat-table th {
+    padding: 9px 12px;
+    text-align: left;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+}
+.cat-table th.right, .cat-table td.right { text-align: right; }
+.cat-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+}
+.cat-table tr:last-child td { border-bottom: none; }
+.cat-table tr:hover td { background: #f8fafc; }
+.price-cell { font-weight: 600; color: var(--primary); }
+
+/* ── DESKTOP OVERRIDES (≥ 700px) ─────────────────────────────────────── */
+@media (min-width: 700px) {
+    .page { padding: 24px 20px 60px; }
+    .container { padding: 40px 44px; }
+    .info-row-top { grid-template-columns: 2fr 1fr; gap: 16px; }
+    .info-row-rates { gap: 14px; }   /* columns set by JS inline style */
+    .info-panel { padding: 20px 24px; gap: 16px; }
+    .entry-panel { padding: 20px 24px; }
+    .fields-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+    }
+    .fields-grid .field:last-child { grid-column: auto; }
+    .tab-btn { padding: 11px 24px; font-size: 15px; }
+    h1 { font-size: 38px; }
+    .subtitle { font-size: 13px; }
+    .totals-card {
+        grid-template-columns: auto auto auto 1fr;
+        gap: 24px;
+    }
+    .totals-grand {
+        grid-column: auto;
+        border-top: none;
+        padding-top: 0;
+        border-left: 1px solid rgba(255,255,255,.1);
+        padding-left: 24px;
+        justify-content: flex-end;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+    .grand-total { font-size: 36px; }
+    table { font-size: 14px; }
+    th { padding: 12px 14px; font-size: 13px; }
+    td { padding: 11px 14px; }
+    .cat-section-title { font-size: 20px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOP NAV (populated by JS) -->
+<nav class="top-nav" id="topNav">
+    <div class="nav-brand">Mambakkadans S&amp;C</div>
+</nav>
+
+<!-- PAGE: QUOTATION -->
+<div class="page active" id="page-quotation">
+<div class="container">
+
+    <div class="header">
+        <h1>Mambakkadans Steels &amp; Cements</h1>
+        <div class="subtitle">Professional Quotation System</div>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-row-top">
+            <div class="field">
+                <label>Customer Name</label>
+                <input type="text" id="customer" placeholder="Enter customer name">
+            </div>
+            <div class="field">
+                <label>Date</label>
+                <input type="date" id="date">
+            </div>
+        </div>
+        <hr class="divider">
+        <div class="info-row-rates" id="rateFields">
+            <!-- rate inputs injected by JS -->
+        </div>
+    </div>
+
+    <div class="tabs" id="tabBar"></div>
+    <div id="tabPanes"></div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cat</th><th>Size / Length</th><th>Gauge</th>
+                    <th>Qty</th><th>Per Piece</th><th>Total</th>
+                    <th>Rate</th><th style="text-align:right;">Amount</th><th></th>
+                </tr>
+            </thead>
+            <tbody id="billBody">
+                <tr><td colspan="9" class="empty-state">No items added yet. Select a category above and add items.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="totals-card">
+        <div class="totals-stat">
+            <span class="stat-label">Total Weight</span>
+            <span class="stat-value" id="totalWeight">0.00 kg</span>
+        </div>
+        <div class="totals-stat">
+            <span class="stat-label">Freight</span>
+            <span class="stat-value" id="freightDisplay">₹0.00</span>
+        </div>
+        <div class="totals-stat">
+            <span class="stat-label">Items</span>
+            <span class="stat-value" id="itemCount">0</span>
+        </div>
+        <div class="totals-grand">
+            <span class="stat-label">Grand Total</span>
+            <div class="grand-total" id="finalTotal">₹0.00</div>
+        </div>
+    </div>
+
+    <button class="btn-pdf" onclick="saveQuotation()">⬇ Download Official PDF Quote</button>
+
+</div>
+</div><!-- /page-quotation -->
+
+<!-- PAGE: CATALOGUE (populated by JS) -->
+<div class="page" id="page-catalogue">
+<div class="container">
+    <div class="header">
+        <h1>Product Catalogue</h1>
+        <div class="subtitle">Mambakkadans Steels &amp; Cements — All Products &amp; Weights</div>
+    </div>
+    <div id="catalogueSections"></div>
+</div>
+</div><!-- /page-catalogue -->
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════════════════
+//  ██████╗  █████╗ ████████╗ █████╗
+//  ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗
+//  ██║  ██║███████║   ██║   ███████║
+//  ██║  ██║██╔══██║   ██║   ██╔══██║
+//  ██████╔╝██║  ██║   ██║   ██║  ██║
+//  ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+//
+//  ► To add a new PRODUCT to an existing category:
+//      Just add a new entry to the category's `products` object.
+//
+//  ► To add a new CATEGORY:
+//      Copy one of the category blocks below, give it a new `id`, and fill
+//      in the details. Everything else (tabs, rate fields, catalogue,
+//      rate syncing, PDF) is handled automatically.
+//
+// ════════════════════════════════════════════════════════════════════════════
+
+const CATEGORIES = [
+
+    // ── GP PIPES ────────────────────────────────────────────────────────────
+    {
+        id:          'gp',
+        label:       'GP Pipes',
+        rateLabel:   'GP Rate (₹/kg)',
+        defaultRate: 74,
+        unit:        'kg',
+        badge:       { bg: '#dbeafe', color: '#1d4ed8' },
+
+        // type: 'gauge'
+        // Products are { [sizeName]: { 16: weightKg, 18: weightKg|null } }
+        // null means that gauge is unavailable for that size.
+        type: 'gauge',
+        products: {
+            "1/2\" × 1/2\" (16×16mm)":       { 16: 4.0,  18: 3.2  },
+            "3/4\" × 3/4\" (20×20mm)":       { 16: 5.0,  18: 4.0  },
+            "1\" × 1\" (25×25mm)":           { 16: 6.0,  18: 5.2  },
+            "1 1/4\" × 1 1/4\" (32×32mm)":   { 16: 8.0,  18: null },
+            "1 1/2\" × 1 1/2\" (40×40mm)":   { 16: 10.0, 18: null },
+            "2\" × 2\" (50×50mm)":           { 16: 12.6, 18: null },
+            "3\" × 3\" (75×75mm)":           { 16: 19.0, 18: null },
+            "4\" × 4\" (100×100mm)":         { 16: 26.0, 18: null },
+            "1\" × 10\" (25×10mm)":          { 16: 5.0,  18: null },
+            "1 1/2\" × 10\" (40×10mm)":      { 16: 6.2,  18: null },
+            "1 1/2\" × 3/4\" (40×20mm)":     { 16: 7.6,  18: null },
+            "2\" × 1\" (50×25mm)":           { 16: 9.6,  18: 8.5  },
+            "2 1/2\" × 1 1/2\" (60×40mm)":   { 16: 12.6, 18: 12.5 },
+            "3\" × 1\" (75×25mm)":           { 16: 12.6, 18: 11.0 },
+            "3\" × 1 1/2\" (80×40mm)":       { 16: 15.2, 18: 12.8 },
+            "4\" × 1\" (100×25mm)":          { 16: 15.2, 18: null },
+            "4\" × 2\" (100×50mm)":          { 16: 19.0, 18: null },
+            "1\" Round GP":                  { 16: 6.0,  18: null },
+            "1 1/4\" Round GP":              { 16: 7.9,  18: null },
+            "1 1/2\" Round GP":              { 16: 9.9,  18: null },
+            "2\" Round GP":                  { 16: 12.5, 18: null },
+            "2 1/2\" Round GP":              { 16: 14.5, 18: null },
+            "3\" Round GP":                  { 16: 20.5, 18: null },
+        },
+
+        // catalogue: split into sub-groups based on name pattern
+        catalogueGroups: [
+            { label: 'Square / Rectangular', filter: name => !name.toLowerCase().includes('round') },
+            { label: 'Round',                filter: name =>  name.toLowerCase().includes('round') },
+        ],
+    },
+
+    // ── GI PIPES ────────────────────────────────────────────────────────────
+    {
+        id:          'gi',
+        label:       'GI Pipes',
+        rateLabel:   'GI Rate (₹/kg)',
+        defaultRate: 80,
+        unit:        'kg',
+        badge:       { bg: '#dcfce7', color: '#15803d' },
+
+        // type: 'simple'
+        // Products are { [sizeName]: weightKg }
+        type: 'simple',
+        col2:      'Type',
+        col2value: () => 'Round, Heavy Duty',
+        products: {
+            "1/2\" Round GI":   0,
+            "3/4\" Round GI":   7.9,
+            "1\" Round GI":     9.8,
+            "1 1/4\" Round GI": 12.4,
+            "1 1/2\" Round GI": 14.4,
+            "2\" Round GI":     18.0,
+            "2 1/2\" Round GI": 22.9,
+            "3\" Round GI":     26.0,
+            "3 1/2\" Round GI": 32.0,
+            "4\" Round GI":     34.0,
+            "5\" Round GI":     45.3,
+        },
+    },
+
+    // ── TMT BARS ────────────────────────────────────────────────────────────
+    {
+        id:          'tmt',
+        label:       'TMT Bars',
+        rateLabel:   'TMT Rate (₹/kg)',
+        defaultRate: 68.5,
+        unit:        'kg',
+        badge:       { bg: '#fef3c7', color: '#b45309' },
+
+        // type: 'keyed'
+        // Products are { [sizeName]: { kgPerPiece, col2 } }
+        type: 'keyed',
+        col2: 'Brand',
+        products: {
+            "8mm":  { kgPerPiece: 4.6,  col2: 'Metcon' },
+            "10mm": { kgPerPiece: 7.4,  col2: 'Metcon' },
+            "12mm": { kgPerPiece: 10.5, col2: 'Metcon' },
+            "16mm": { kgPerPiece: 18.5, col2: 'Metcon' },
+            "20mm": { kgPerPiece: 28.5, col2: 'Metcon' },
+        },
+    },
+
+    // ── ROOFING SHEETS ──────────────────────────────────────────────────────
+    {
+        id:          'rs',
+        label:       'Roofing Sheets',
+        rateLabel:   'Sheet Rate (₹/sqft)',
+        defaultRate: 35.5,
+        unit:        'sqft',
+        badge:       { bg: '#f3e8ff', color: '#7e22ce' },
+
+        // type: 'sheets'
+        // Size chosen from lengths list; price = qty × area × rate.
+        // Custom length option is always added automatically.
+        type:        'sheets',
+        widthFt:     3.61,
+        thicknessMm: 0.35,
+        brand:       'JSW',
+        lengths:     [6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+    },
+
+    // ── HARDWARE ────────────────────────────────────────────────────────────
+    {
+        id:          'hw',
+        label:       'Hardware',
+        rateLabel:   'Hardware Rate (₹/nos)',
+        defaultRate: 0,
+        unit:        'nos',
+        badge:       { bg: '#fce7f3', color: '#9d174d' },
+
+        // type: 'unit'
+        // No weight conversion — amount = qty × rate directly.
+        // Each product has its own defaultRate.
+        // Editing the rate in the tab updates that product's default for the session.
+        type: 'unit',
+        col2: 'Unit',
+        products: {
+            "1L Thinner": { defaultRate: 160 },
+        },
+    },
+
+];
+
+// ════════════════════════════════════════════════════════════════════════════
+//  END OF DATA — do not need to edit below this line to add products
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+
+const fmt = n => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function getRate(id) {
+    return parseFloat(document.getElementById('rate-' + id)?.value) || 0;
+}
+
+function syncRates(id, value) {
+    ['rate-' + id, 'cat-rate-' + id].forEach(elId => {
+        const el = document.getElementById(elId);
+        if (el && el.value !== String(value)) el.value = value;
+    });
+}
+
+function badgeStyle(catId) {
+    const c = CATEGORIES.find(c => c.id === catId);
+    return c ? `background:${c.badge.bg};color:${c.badge.color}` : '';
+}
+
+// ── UNIT RATE HELPERS ─────────────────────────────────────────────────────
+
+function fillUnitRate(catId) {
+    const cat  = CATEGORIES.find(c => c.id === catId);
+    if (!cat || cat.type !== 'unit') return;
+    const size = document.getElementById(catId + '-size').value;
+    const prod = cat.products[size];
+    document.getElementById(catId + '-item-rate').value = prod?.defaultRate ?? '';
+}
+
+function saveUnitRate(catId) {
+    const cat  = CATEGORIES.find(c => c.id === catId);
+    if (!cat || cat.type !== 'unit') return;
+    const size = document.getElementById(catId + '-size').value;
+    const rate = parseFloat(document.getElementById(catId + '-item-rate').value);
+    if (!isNaN(rate) && cat.products[size]) {
+        cat.products[size].defaultRate = rate;
+        renderCatalogue();
+    }
+}
+
+// ── BUILD UI ──────────────────────────────────────────────────────────────
+
+function buildUI() {
+    buildNavButtons();
+    buildRateFields();
+    buildTabs();
+    buildTabPanes();
+    buildCatalogueSections();
+    injectBadgeStyles();
+    populateDropdowns();
+    document.getElementById('date').valueAsDate = new Date();
+}
+
+function buildNavButtons() {
+    const nav = document.getElementById('topNav');
+    [['quotation', '📋 Quotation'], ['catalogue', '📦 Catalogue']].forEach(([page, label], i) => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+        btn.textContent = label;
+        btn.onclick = () => showPage(page, btn);
+        nav.appendChild(btn);
+    });
+}
+
+function buildRateFields() {
+    const container = document.getElementById('rateFields');
+
+    // One input per non-unit category
+    CATEGORIES.forEach(cat => {
+        if (cat.type === 'unit') return;
+        const div = document.createElement('div');
+        div.className = 'field';
+        div.innerHTML = `
+            <label>${cat.rateLabel}</label>
+            <input type="number" id="rate-${cat.id}" value="${cat.defaultRate}"
+                   oninput="syncRates('${cat.id}', this.value); recalcAll()">`;
+        container.appendChild(div);
+    });
+
+    // Freight always last
+    const freight = document.createElement('div');
+    freight.className = 'field';
+    freight.innerHTML = `
+        <label>Freight / Coolie (₹)</label>
+        <input type="number" id="freight" value="0" oninput="updateTotals()">`;
+    container.appendChild(freight);
+
+    // On desktop, set columns dynamically; mobile stays at 2-col via CSS
+    const count = CATEGORIES.filter(c => c.type !== 'unit').length + 1;
+    if (window.innerWidth >= 700) {
+        container.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+    }
+    // Also update on resize
+    window.addEventListener('resize', () => {
+        container.style.gridTemplateColumns =
+            window.innerWidth >= 700 ? `repeat(${count}, 1fr)` : 'repeat(2, 1fr)';
+    });
+}
+
+function buildTabs() {
+    const bar = document.getElementById('tabBar');
+    CATEGORIES.forEach((cat, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+        btn.textContent = cat.label;
+        btn.onclick = () => switchTab(cat.id, btn);
+        bar.appendChild(btn);
+    });
+}
+
+function buildTabPanes() {
+    const container = document.getElementById('tabPanes');
+    CATEGORIES.forEach((cat, i) => {
+        container.insertAdjacentHTML('beforeend', buildTabPane(cat, i === 0));
+    });
+}
+
+function buildTabPane(cat, isActive) {
+    let fieldsHtml = '';
+
+    if (cat.type === 'gauge') {
+        fieldsHtml = `
+            <div class="field">
+                <label>${cat.label} Size</label>
+                <select id="${cat.id}-size" onchange="updateGpGauges('${cat.id}')"></select>
+            </div>
+            <div class="field">
+                <label>Gauge</label>
+                <div class="gauge-row">
+                    <button class="gauge-btn active" id="${cat.id}-g16" onclick="selectGauge('${cat.id}','16')">16G</button>
+                    <button class="gauge-btn"        id="${cat.id}-g18" onclick="selectGauge('${cat.id}','18')">18G</button>
+                </div>
+            </div>
+            <div class="field">
+                <label>Quantity (Nos)</label>
+                <input type="number" id="${cat.id}-qty" min="1" placeholder="0"
+                       onkeydown="if(event.key==='Enter') addItem('${cat.id}')">
+            </div>`;
+
+    } else if (cat.type === 'simple' || cat.type === 'keyed') {
+        fieldsHtml = `
+            <div class="field">
+                <label>${cat.label} Size</label>
+                <select id="${cat.id}-size"></select>
+            </div>
+            <div class="field">
+                <label>Quantity (Nos)</label>
+                <input type="number" id="${cat.id}-qty" min="1" placeholder="0"
+                       onkeydown="if(event.key==='Enter') addItem('${cat.id}')">
+            </div>`;
+
+    } else if (cat.type === 'unit') {
+        fieldsHtml = `
+            <div class="field">
+                <label>${cat.label} Item</label>
+                <select id="${cat.id}-size" onchange="fillUnitRate('${cat.id}')"></select>
+            </div>
+            <div class="field">
+                <label>Rate (₹/nos)</label>
+                <input type="number" id="${cat.id}-item-rate" placeholder="Rate"
+                       oninput="saveUnitRate('${cat.id}')">
+            </div>
+            <div class="field">
+                <label>Quantity (Nos)</label>
+                <input type="number" id="${cat.id}-qty" min="1" placeholder="0"
+                       onkeydown="if(event.key==='Enter') addItem('${cat.id}')">
+            </div>`;
+
+    } else if (cat.type === 'sheets') {
+        const opts = cat.lengths.map(l => `<option value="${l}">${l} ft</option>`).join('');
+        fieldsHtml = `
+            <div class="field">
+                <label>Length — ${cat.brand} ${cat.thicknessMm}mm</label>
+                <select id="${cat.id}-length" onchange="toggleCustomLength('${cat.id}')">
+                    ${opts}
+                    <option value="custom">Custom...</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Custom Length (ft)</label>
+                <input type="number" id="${cat.id}-custom-length" min="0.1" step="0.1"
+                       placeholder="e.g. 7.5" style="visibility:hidden;">
+            </div>
+            <div class="field">
+                <label>Quantity (Nos)</label>
+                <input type="number" id="${cat.id}-qty" min="1" placeholder="0"
+                       onkeydown="if(event.key==='Enter') addItem('${cat.id}')">
+            </div>`;
+    }
+
+    return `
+        <div class="tab-pane${isActive ? ' active' : ''}" id="tab-${cat.id}">
+            <div class="entry-panel">
+                <div class="fields-grid">${fieldsHtml}</div>
+            </div>
+            <div class="action-row">
+                <button class="btn-add" onclick="addItem('${cat.id}')">+ Add ${cat.label}</button>
+                <button class="btn-reset" onclick="resetBill()">Reset</button>
+            </div>
+        </div>`;
+}
+
+function buildCatalogueSections() {
+    const container = document.getElementById('catalogueSections');
+    CATEGORIES.forEach(cat => {
+        container.insertAdjacentHTML('beforeend', buildCatalogueSection(cat));
+    });
+}
+
+function buildCatalogueSection(cat) {
+    const rateUnit = cat.unit === 'sqft' ? '₹/sqft' : '₹/kg';
+    const rateDesc = cat.unit === 'sqft' ? '— area × rate' : '— weight × rate';
+
+    const rateRowHtml = cat.type === 'unit' ? '' : `
+        <div class="cat-rate-row">
+            <label>Rate (${rateUnit}):</label>
+            <input type="number" class="cat-rate-input" id="cat-rate-${cat.id}"
+                   value="${cat.defaultRate}"
+                   oninput="syncRates('${cat.id}', this.value); renderCatalogue()">
+            <span class="cat-rate-desc">${rateDesc}</span>
+        </div>`;
+
+    let tableHtml = '';
+    const wrapOpen  = '<div class="cat-table-wrap">';
+    const wrapClose = '</div>';
+
+    if (cat.type === 'gauge') {
+        if (cat.catalogueGroups) {
+            tableHtml = cat.catalogueGroups.map(grp => `
+                <div class="cat-sub-title">${grp.label}</div>
+                ${wrapOpen}
+                <table class="cat-table" id="cat-${cat.id}-${grp.label.replace(/\W+/g,'-').toLowerCase()}">
+                    <thead><tr>
+                        <th>Size</th><th>Thickness</th>
+                        <th class="right">Weight/Piece (kg)</th>
+                        <th class="right">Price/Piece (₹)</th>
+                    </tr></thead>
+                    <tbody></tbody>
+                </table>
+                ${wrapClose}`).join('');
+        } else {
+            tableHtml = `${wrapOpen}
+                <table class="cat-table" id="cat-${cat.id}">
+                    <thead><tr>
+                        <th>Size</th><th>Thickness</th>
+                        <th class="right">Weight/Piece (kg)</th>
+                        <th class="right">Price/Piece (₹)</th>
+                    </tr></thead>
+                    <tbody></tbody>
+                </table>${wrapClose}`;
+        }
+    } else if (cat.type === 'simple') {
+        tableHtml = `${wrapOpen}
+            <table class="cat-table" id="cat-${cat.id}">
+                <thead><tr>
+                    <th>Size</th><th>${cat.col2 || 'Type'}</th>
+                    <th class="right">Weight/Piece (kg)</th>
+                    <th class="right">Price/Piece (₹)</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>${wrapClose}`;
+    } else if (cat.type === 'keyed') {
+        tableHtml = `${wrapOpen}
+            <table class="cat-table" id="cat-${cat.id}">
+                <thead><tr>
+                    <th>Size</th><th>${cat.col2 || 'Info'}</th>
+                    <th class="right">Weight/Piece (kg)</th>
+                    <th class="right">Price/Piece (₹)</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>${wrapClose}`;
+    } else if (cat.type === 'unit') {
+        tableHtml = `${wrapOpen}
+            <table class="cat-table" id="cat-${cat.id}">
+                <thead><tr>
+                    <th>Product</th><th>${cat.col2 || 'Unit'}</th>
+                    <th class="right">Rate (₹)</th>
+                    <th class="right">Per</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>${wrapClose}`;
+    } else if (cat.type === 'sheets') {
+        tableHtml = `${wrapOpen}
+            <table class="cat-table" id="cat-${cat.id}">
+                <thead><tr>
+                    <th>Length</th><th>Width / Thickness</th>
+                    <th class="right">Area/Sheet (sqft)</th>
+                    <th class="right">Price/Sheet (₹)</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>${wrapClose}`;
+    }
+
+    return `
+        <div class="cat-section">
+            <div class="cat-section-title">
+                <span class="cat-badge badge-${cat.id}" style="font-size:11px;padding:3px 9px;">${cat.id.toUpperCase()}</span>
+                ${cat.label}
+            </div>
+            ${rateRowHtml}
+            ${tableHtml}
+        </div>`;
+}
+
+function injectBadgeStyles() {
+    const style = document.createElement('style');
+    style.textContent = CATEGORIES.map(cat =>
+        `.badge-${cat.id} { background: ${cat.badge.bg}; color: ${cat.badge.color}; }`
+    ).join('\n');
+    document.head.appendChild(style);
+}
+
+// ── DROPDOWNS ─────────────────────────────────────────────────────────────
+
+function populateDropdowns() {
+    CATEGORIES.forEach(cat => {
+        const sel = document.getElementById(cat.id + '-size');
+        if (!sel) return;
+
+        if (cat.type === 'gauge' || cat.type === 'simple' || cat.type === 'keyed' || cat.type === 'unit') {
+            Object.keys(cat.products).forEach(k => {
+                const o = document.createElement('option');
+                o.value = o.text = k;
+                sel.add(o);
+            });
+        }
+        if (cat.type === 'gauge') updateGpGauges(cat.id);
+        if (cat.type === 'unit')  fillUnitRate(cat.id);
+    });
+}
+
+// ── GAUGE LOGIC ───────────────────────────────────────────────────────────
+
+const selectedGauge = {};
+
+function updateGpGauges(catId) {
+    const cat = CATEGORIES.find(c => c.id === catId);
+    if (!cat || cat.type !== 'gauge') return;
+    const size  = document.getElementById(catId + '-size').value;
+    const has18 = cat.products[size]?.[18] != null;
+    const btn18 = document.getElementById(catId + '-g18');
+    btn18.disabled = !has18;
+    if (!has18) {
+        btn18.classList.remove('active');
+        document.getElementById(catId + '-g16').classList.add('active');
+        selectedGauge[catId] = '16';
+    }
+    selectedGauge[catId] = selectedGauge[catId] || '16';
+}
+
+function selectGauge(catId, g) {
+    const cat  = CATEGORIES.find(c => c.id === catId);
+    if (!cat) return;
+    const size = document.getElementById(catId + '-size').value;
+    if (g === '18' && (!cat.products[size] || cat.products[size][18] == null)) return;
+    selectedGauge[catId] = g;
+    document.getElementById(catId + '-g16').classList.toggle('active', g === '16');
+    document.getElementById(catId + '-g18').classList.toggle('active', g === '18');
+}
+
+// ── CUSTOM LENGTH ─────────────────────────────────────────────────────────
+
+function toggleCustomLength(catId) {
+    const isCustom = document.getElementById(catId + '-length').value === 'custom';
+    const inp = document.getElementById(catId + '-custom-length');
+    inp.style.visibility = isCustom ? 'visible' : 'hidden';
+    if (isCustom) inp.focus();
+}
+
+// ── TABS & PAGES ──────────────────────────────────────────────────────────
+
+function switchTab(tabId, el) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function showPage(page, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    btn.classList.add('active');
+    if (page === 'catalogue') renderCatalogue();
+}
+
+// ── CART ──────────────────────────────────────────────────────────────────
+
+let cartItems = [];
+
+function addItem(catId) {
+    const cat = CATEGORIES.find(c => c.id === catId);
+    const qty = parseFloat(document.getElementById(catId + '-qty').value);
+    if (!qty || qty <= 0) { alert('Enter a valid quantity'); return; }
+
+    let item, rate;
+
+    if (cat.type === 'gauge') {
+        rate = getRate(catId);
+        const size  = document.getElementById(catId + '-size').value;
+        let   gauge = selectedGauge[catId] || '16';
+        let   wt    = cat.products[size]?.[parseInt(gauge)];
+        if (!wt) { wt = cat.products[size][16]; gauge = '16'; alert(`18G not available for ${size}. Using 16G.`); }
+        item = { cat: catId.toUpperCase(), size, gauge: gauge + 'G', qty,
+                 perPiece: wt, total: wt * qty, rate, amount: wt * qty * rate, unit: cat.unit };
+
+    } else if (cat.type === 'simple') {
+        rate = getRate(catId);
+        const size = document.getElementById(catId + '-size').value;
+        const wt   = cat.products[size];
+        item = { cat: catId.toUpperCase(), size, gauge: '—', qty,
+                 perPiece: wt, total: wt * qty, rate, amount: wt * qty * rate, unit: cat.unit };
+
+    } else if (cat.type === 'keyed') {
+        rate = getRate(catId);
+        const size = document.getElementById(catId + '-size').value;
+        const wt   = cat.products[size].kgPerPiece;
+        item = { cat: catId.toUpperCase(), size, gauge: '—', qty,
+                 perPiece: wt, total: wt * qty, rate, amount: wt * qty * rate, unit: cat.unit };
+
+    } else if (cat.type === 'unit') {
+        rate = parseFloat(document.getElementById(catId + '-item-rate').value) || 0;
+        if (!rate) { alert('Enter a rate for this item'); return; }
+        const size = document.getElementById(catId + '-size').value;
+        item = { cat: catId.toUpperCase(), size, gauge: '—', qty,
+                 perPiece: 1, total: qty, rate, amount: qty * rate, unit: cat.unit };
+
+    } else if (cat.type === 'sheets') {
+        rate = getRate(catId);
+        const lenSel = document.getElementById(catId + '-length').value;
+        let length;
+        if (lenSel === 'custom') {
+            length = parseFloat(document.getElementById(catId + '-custom-length').value);
+            if (!length || length <= 0) { alert('Enter a valid custom length'); return; }
+        } else {
+            length = parseFloat(lenSel);
+        }
+        const sqftPerSheet = parseFloat((length * cat.widthFt).toFixed(2));
+        const totalSqft    = parseFloat((sqftPerSheet * qty).toFixed(2));
+        item = {
+            cat: catId.toUpperCase(),
+            size: `${length}ft × ${cat.widthFt}ft (${cat.brand} ${cat.thicknessMm}mm)`,
+            gauge: cat.thicknessMm + 'mm',
+            qty, perPiece: sqftPerSheet, total: totalSqft,
+            rate, amount: totalSqft * rate, unit: 'sqft',
+        };
+    }
+
+    cartItems.push(item);
+    document.getElementById(catId + '-qty').value = '';
+    document.getElementById(catId + '-qty').focus();
+    renderTable();
+}
+
+function deleteItem(i) {
+    cartItems.splice(i, 1);
+    renderTable();
+}
+
+function renderTable() {
+    const tbody = document.getElementById('billBody');
+    if (!cartItems.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No items added yet. Select a category above and add items.</td></tr>';
+        updateTotals();
+        return;
+    }
+    tbody.innerHTML = cartItems.map((item, i) => {
+        const isUnit = item.unit === 'nos';
+        return `<tr>
+            <td><span class="cat-badge badge-${item.cat.toLowerCase()}" style="${badgeStyle(item.cat.toLowerCase())}">${item.cat}</span></td>
+            <td>${item.size}</td>
+            <td>${item.gauge}</td>
+            <td>${item.qty}</td>
+            <td>${isUnit ? '—' : item.perPiece + ' ' + item.unit}</td>
+            <td>${isUnit ? item.qty + ' nos' : item.total.toFixed(2) + ' ' + item.unit}</td>
+            <td>₹${item.rate}/${item.unit}</td>
+            <td style="text-align:right;font-weight:600;">₹${item.amount.toFixed(2)}</td>
+            <td><button class="btn-del" onclick="deleteItem(${i})" title="Remove">✕</button></td>
+        </tr>`;
+    }).join('');
+    updateTotals();
+}
+
+function recalcAll() {
+    const rates = {};
+    CATEGORIES.forEach(cat => { rates[cat.id.toUpperCase()] = getRate(cat.id); });
+    cartItems.forEach(item => {
+        if (item.unit !== 'nos') {
+            item.rate   = rates[item.cat] || 0;
+            item.amount = item.total * item.rate;
+        }
+    });
+    renderTable();
+}
+
+function updateTotals() {
+    let grandWeight = 0, grandTotal = 0;
+    cartItems.forEach(item => {
+        if (item.unit === 'kg') grandWeight += item.total;
+        grandTotal += item.amount;
+    });
+    const freight = parseFloat(document.getElementById('freight').value) || 0;
+    document.getElementById('totalWeight').textContent    = grandWeight.toFixed(2) + ' kg';
+    document.getElementById('freightDisplay').textContent = '₹' + freight.toFixed(2);
+    document.getElementById('itemCount').textContent      = cartItems.length;
+    document.getElementById('finalTotal').textContent     = '₹' + (grandTotal + freight).toFixed(2);
+}
+
+function resetBill() {
+    if (confirm('Clear all items?')) {
+        cartItems = [];
+        document.getElementById('freight').value = 0;
+        renderTable();
+    }
+}
+
+// ── CATALOGUE ─────────────────────────────────────────────────────────────
+
+function renderCatalogue() {
+    CATEGORIES.forEach(cat => {
+        const rate = parseFloat(document.getElementById('cat-rate-' + cat.id)?.value) || 0;
+
+        if (cat.type === 'gauge') {
+            if (cat.catalogueGroups) {
+                cat.catalogueGroups.forEach(grp => {
+                    const tableId = `cat-${cat.id}-${grp.label.replace(/\W+/g,'-').toLowerCase()}`;
+                    const tbody = document.querySelector(`#${tableId} tbody`);
+                    if (!tbody) return;
+                    const rows = [];
+                    Object.entries(cat.products).forEach(([size, gauges]) => {
+                        if (!grp.filter(size)) return;
+                        Object.entries(gauges).forEach(([g, wt]) => {
+                            if (wt == null) return;
+                            const thick = g === '16' ? '1.6mm (16G)' : '1.2mm (18G)';
+                            rows.push(`<tr>
+                                <td>${size}</td><td>${thick}</td>
+                                <td class="right">${fmt(wt)}</td>
+                                <td class="right price-cell">₹${fmt(wt * rate)}</td>
+                            </tr>`);
+                        });
+                    });
+                    tbody.innerHTML = rows.join('') || '<tr><td colspan="4" class="empty-state">—</td></tr>';
+                });
+            } else {
+                const tbody = document.querySelector(`#cat-${cat.id} tbody`);
+                if (!tbody) return;
+                const rows = [];
+                Object.entries(cat.products).forEach(([size, gauges]) => {
+                    Object.entries(gauges).forEach(([g, wt]) => {
+                        if (wt == null) return;
+                        const thick = g === '16' ? '1.6mm (16G)' : '1.2mm (18G)';
+                        rows.push(`<tr>
+                            <td>${size}</td><td>${thick}</td>
+                            <td class="right">${fmt(wt)}</td>
+                            <td class="right price-cell">₹${fmt(wt * rate)}</td>
+                        </tr>`);
+                    });
+                });
+                tbody.innerHTML = rows.join('') || '<tr><td colspan="4" class="empty-state">—</td></tr>';
+            }
+
+        } else if (cat.type === 'simple') {
+            const tbody = document.querySelector(`#cat-${cat.id} tbody`);
+            if (!tbody) return;
+            tbody.innerHTML = Object.entries(cat.products).map(([size, wt]) => `
+                <tr>
+                    <td>${size}</td>
+                    <td>${typeof cat.col2value === 'function' ? cat.col2value(size) : ''}</td>
+                    <td class="right">${wt > 0 ? fmt(wt) : '—'}</td>
+                    <td class="right price-cell">${wt > 0 ? '₹' + fmt(wt * rate) : '—'}</td>
+                </tr>`).join('');
+
+        } else if (cat.type === 'keyed') {
+            const tbody = document.querySelector(`#cat-${cat.id} tbody`);
+            if (!tbody) return;
+            tbody.innerHTML = Object.entries(cat.products).map(([size, d]) => `
+                <tr>
+                    <td>${size}</td><td>${d.col2 || ''}</td>
+                    <td class="right">${fmt(d.kgPerPiece)}</td>
+                    <td class="right price-cell">₹${fmt(d.kgPerPiece * rate)}</td>
+                </tr>`).join('');
+
+        } else if (cat.type === 'unit') {
+            const tbody = document.querySelector(`#cat-${cat.id} tbody`);
+            if (!tbody) return;
+            tbody.innerHTML = Object.entries(cat.products).map(([name, prod]) => `
+                <tr>
+                    <td>${name}</td>
+                    <td>${cat.unit}</td>
+                    <td class="right price-cell">₹${fmt(prod?.defaultRate ?? 0)}</td>
+                    <td class="right">per ${cat.unit}</td>
+                </tr>`).join('');
+
+        } else if (cat.type === 'sheets') {
+            const tbody = document.querySelector(`#cat-${cat.id} tbody`);
+            if (!tbody) return;
+            tbody.innerHTML = cat.lengths.map(len => {
+                const sqft = parseFloat((len * cat.widthFt).toFixed(2));
+                return `<tr>
+                    <td>${len} ft</td>
+                    <td>${cat.widthFt}ft · ${cat.thicknessMm}mm (${cat.brand})</td>
+                    <td class="right">${fmt(sqft)}</td>
+                    <td class="right price-cell">₹${fmt(sqft * rate)}</td>
+                </tr>`;
+            }).join('');
+        }
+    });
+}
+
+// ── PDF ───────────────────────────────────────────────────────────────────
+
+async function saveQuotation() {
+    if (!cartItems.length) { alert('Add at least one item before downloading.'); return; }
+    const { jsPDF } = window.jspdf;
+    const doc      = new jsPDF();
+    const customer = document.getElementById('customer').value || 'Cash Customer';
+    const date     = document.getElementById('date').value;
+    const freight  = parseFloat(document.getElementById('freight').value) || 0;
+
+    let pdfWeight = 0, pdfTotal = 0;
+    const rows = cartItems.map(item => {
+        if (item.unit === 'kg') pdfWeight += item.total;
+        pdfTotal += item.amount;
+        const isUnit = item.unit === 'nos';
+        return [
+            item.cat, item.size, item.gauge, item.qty,
+            isUnit ? '—' : item.perPiece + ' ' + item.unit,
+            isUnit ? item.qty + ' nos' : item.total.toFixed(2) + ' ' + item.unit,
+            'Rs.' + item.rate + '/' + item.unit,
+            'Rs.' + item.amount.toFixed(2)
+        ];
+    });
+
+    doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+    doc.text('MAMBAKKADANS STEELS & CEMENTS', 105, 18, null, null, 'center');
+    doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+    doc.text('Quotation / Estimate', 105, 25, null, null, 'center');
+    doc.setDrawColor(200); doc.line(14, 29, 196, 29);
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    doc.text('Customer:', 14, 37); doc.setFont('helvetica', 'normal'); doc.text(customer, 42, 37);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Date:', 150, 37); doc.setFont('helvetica', 'normal'); doc.text(date, 163, 37);
+
+    doc.autoTable({
+        startY: 43,
+        head: [['Cat', 'Size', 'Gauge', 'Qty', 'Per Piece', 'Total', 'Rate', 'Amount']],
+        body: rows,
+        theme: 'striped',
+        headStyles: { fillColor: [15, 23, 42], fontSize: 9, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        columnStyles: { 7: { halign: 'right' } },
+        foot: [
+            ['', '', '', '', '', pdfWeight.toFixed(2) + ' kg', 'Subtotal:', 'Rs.' + pdfTotal.toFixed(2)],
+            ['', '', '', '', '', '', 'Freight:', 'Rs.' + freight.toFixed(2)],
+            ['', '', '', '', '', '', 'GRAND TOTAL:', 'Rs.' + (pdfTotal + freight).toFixed(2)]
+        ],
+        footStyles: { fillColor: [241, 245, 249], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 9 }
+    });
+
+    const y = doc.lastAutoTable.finalY + 16;
+    doc.setFontSize(9); doc.setTextColor(100);
+    doc.text('Thank you for your business! — Mambakkadans Steels & Cements', 105, y, null, null, 'center');
+    doc.save(`${customer.replace(/\s+/g, '_')}_Quotation.pdf`);
+}
+
+// ── START ─────────────────────────────────────────────────────────────────
+buildUI();
+</script>
+</body>
+</html>
